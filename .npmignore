@@ -1,0 +1,7 @@
+*
+*/
+!man/
+!LICENSE
+!ops-docker
+!package.json
+!README.md

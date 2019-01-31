@@ -1,0 +1,30 @@
+{
+  "name": "@ops-tools/ops-docker",
+  "version": "1.0.0",
+  "description": "Configurable docker deployment tool in pure bash",
+  "license": "MIT",
+  "author": "Andrey Kravstov <raidendev@gmail.com>",
+  "homepage": "https://github.com/ops-tools/ops-docker",
+  "bugs": "https://github.com/ops-tools/ops-docker/issues",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ops-tools/ops-docker.git"
+  },
+  "keywords": [
+    "docker",
+    "deploy"
+    "bash",
+    "ops",
+    "devops",
+    "admin",
+    "infra",
+    "iac"
+  ],
+  "bin": {
+    "ops-docker": "./ops-docker"
+  },
+  "scripts": {
+    "start": "./ops-docker",
+    "test": "tests/all"
+  }
+}

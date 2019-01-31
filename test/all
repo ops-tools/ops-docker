@@ -1,0 +1,20 @@
+#!/bin/bash
+
+__lib="$(dirname "$0")/lib"
+__exit_code=0
+
+source "${__lib}/_vars.sh"
+source "${__lib}/build.sh"
+source "${__lib}/transport.sh"
+source "${__lib}/prepare.sh"
+source "${__lib}/launch.sh"
+source "${__lib}/rollback.sh"
+source "${__lib}/_define.sh"
+source "${__lib}/_parse_uri.sh"
+source "${__lib}/_exec.sh"
+source "${__lib}/_exec_remote.sh"
+source "${__lib}/_parse_args.sh"
+source "${__lib}/_print_help.sh"
+source "${__lib}/main.sh"
+
+exit ${__exit_code}
