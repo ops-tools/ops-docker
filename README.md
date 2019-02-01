@@ -2,7 +2,7 @@
 
 > Configurable docker deployment tool in pure bash
 
-ops-docker – is a single bash script that could perform standard deploy tasks in an simple and performant way using tools you already have in your systems for decades or so.
+ops-docker – is a single bash script that could perform standard deploy tasks in a simple and performant way using tools you already have in your systems for decades or so.
 
 ### Why?
 
