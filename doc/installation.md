@@ -1,10 +1,25 @@
 # Installation
 
-By its nature ops-docker has no need in installation and could be used wherever it's placed if all runtime dependencies are satisfied. But if you wish to use ops-docker binary and man pages globally, you could install it in several ways.
+By its nature ops-docker has no need in installation and could be used wherever it placed if all [runtime dependencies](#dependencies) are satisfied, so you can just download and copy [ops-docker](../ops-docker) script to your PATH or local project. If you feel not right with manual copying files from GithHub and want some level of automatization and versioning, you can choose one of the following installation methods, which is best fits your needs.
 
-## Installation
+## Git Submodule
 
-TBW.
+In this method, ops-docker will be added as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to your project's repository. This gives you standard well-known git way for tracking updates and fetching latest versions.
+
+Add ops-docker as submodule from branch *master* and shallow clone it.
+
+```sh
+$ git config -f .gitmodules submodule.ops-docker.shallow true
+$ git submodule add -b master -- git@github.com:ops-tools/ops-docker.git ops-docker
+```
+
+Commit added submodule.
+
+```sh
+$ git commit -m 'Add ops-docker submodule'
+```
+
+Now you can use ops-docker from local directory: `ops-docker/ops-docker --help`.
 
 ## Dependencies
 
