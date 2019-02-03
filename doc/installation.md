@@ -6,11 +6,11 @@ By its nature ops-docker has no need in installation and could be used wherever 
 
 In this method, ops-docker will be added as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to your project's repository. This gives you standard well-known git way for tracking updates and fetching latest versions.
 
-Add ops-docker as submodule from branch *master* and shallow clone it.
+Add ops-docker as submodule from branch *release* and shallow clone it.
 
 ```sh
 $ git config -f .gitmodules submodule.ops-docker.shallow true
-$ git submodule add -b master -- git@github.com:ops-tools/ops-docker.git ops-docker
+$ git submodule add -b release -- https://github.com/ops-tools/ops-docker.git ops-docker
 ```
 
 Commit added submodule.
