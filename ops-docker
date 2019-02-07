@@ -89,7 +89,7 @@ transport() {
   cp -u "${_script}" "${_scriptsdir}/${_work_script}"
   cp -u "${_config}" "${_configsdir}/${_work_config}"
 
-  docker save "${images[@]}" | tar \
+  docker save "${_work_image}" | tar \
     --keep-newer-files \
     --warning=no-ignore-newer \
     -C "${_imagesdir}/${_work_image}" \
@@ -165,7 +165,7 @@ prepare() {
     fi
 
     cmd+=("${create_options[@]}")
-    cmd+=("${images[0]}")
+    cmd+=("${_work_image}")
     cmd+=("${create_args[@]}")
 
     pre_create
