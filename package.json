@@ -8,7 +8,7 @@
   "bugs": "https://github.com/ops-tools/ops-docker/issues",
   "repository": {
     "type": "git",
-    "url": "git@github.com:ops-tools/ops-docker.git"
+    "url": "https://github.com/ops-tools/ops-docker.git"
   },
   "keywords": [
     "docker",
