@@ -2,7 +2,7 @@
 
 > Configurable docker deployment tool in pure bash
 
-ops-docker – is a single bash script that could perform standard deploy tasks in a simple and performant way using tools you already have in your systems for decades or so.
+ops-docker – is a single bash script that can perform standard deploy tasks in a simple and performant way using tools you already have in your systems for decades or so.
 
 ### Why?
 
@@ -24,7 +24,7 @@ Configuration files of ops-docker that is also plain bash sources allow you to p
 
 ## Installation
 
-Installation as such is not required for using ops-docker, but if you wish you could follow the [installation doc](doc/installation.md) for detailed guide.
+Installation as such is not required for using ops-docker, but if you wish you can follow the [installation doc](doc/installation.md) for detailed guide.
 
 Runtime dependencies ops-docker relying on: `bash`, `sed`, `tar`, `ssh`, `openssl`, `rsync` and `docker`.
 
@@ -57,7 +57,7 @@ Options:
 
 ### Commands
 
-ops-docker commands are basically higher-level abstractions for plain Docker commands combined with some standard unix programs like ssh in purpose to simplify the deployment process for a developer or ops engineer. Commands could be combined into chains to perform complex actions and there is also some shortcuts for common operations, like rolling out the app or rolling it back to the previous state.
+ops-docker commands are basically higher-level abstractions for plain Docker commands combined with some standard unix programs like ssh in purpose to simplify the deployment process for a developer or ops engineer. Commands can be combined into chains to perform complex actions and there is also some shortcuts for common operations, like rolling out the app or rolling it back to the previous state.
 
 For example.
 
@@ -97,7 +97,7 @@ Stops currently running containers and starts previously exited, one by one.
 
 ### Options
 
-Options could be placed before or after commands list as you prefer. The position of options doesn't make any special meaning, so for example `-l` switch would be applied to all commands you pass.
+Options can be placed before or after commands list as you prefer. The position of options doesn't make any special meaning, so for example `-l` switch would be applied to all commands you pass.
 
 #### -c, --config
 
@@ -113,7 +113,7 @@ Standard option tells that you want to see usage note and immediately exit.
 
 ### Configuration file
 
-A configuration file is a plain bash source include. Variables could be split to *Base settings*, *Docker control settings* and *Hooks* functions.
+A configuration file is a plain bash source include. Variables can be split to *Base settings*, *Docker control settings* and *Hooks* functions.
 
 #### Base settings
 
@@ -243,7 +243,7 @@ There is a number of *pre-* and *post-* hooks, that would be called before or af
   - `pre_start`
   - `post_start`
 
-Hook could be defined right in configuration file.
+Hook can be defined right in configuration file.
 
 ```sh
 post_start() {
