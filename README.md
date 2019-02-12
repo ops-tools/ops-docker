@@ -36,7 +36,7 @@ Running `ops-docker` without parameters or with `--help` switch will show you sh
 
 ```
 $ ops-docker
-Configurable Docker deployment tool in pure bash
+Configurable docker deployment tool in pure bash
 
 Usage: ops-docker [options] <commands>
 
@@ -57,7 +57,7 @@ Options:
 
 ### Commands
 
-ops-docker commands are basically higher-level abstractions for plain Docker commands combined with some standard unix programs like ssh in purpose to simplify the deployment process for a developer or ops engineer. Commands can be combined into chains to perform complex actions and there is also some shortcuts for common operations, like rolling out the app or rolling it back to the previous state.
+ops-docker commands are basically higher-level abstractions for plain docker commands combined with some standard unix programs like ssh in purpose to simplify the deployment process for a developer or ops engineer. Commands can be combined into chains to perform complex actions and there is also some shortcuts for common operations, like rolling out the app or rolling it back to the previous state.
 
 For example.
 
@@ -69,7 +69,7 @@ For example.
 
 #### build
 
-Builds Docker image.
+Builds docker image.
 
 #### transport
 
@@ -85,7 +85,7 @@ Stops currently running and start created at `prepare` step containers one by on
 
 #### deploy
 
-Shortcut for `prepare` and `launch` commands for simplify deploy operation.
+Shortcut for `prepare` and `launch` commands to simplify deploy operation.
 
 #### rollout
 
@@ -122,7 +122,7 @@ A configuration file is a plain bash source include. Variables can be split to *
 ```sh
 basename="project"
 ```
-Base name that would be used for generating containers names and network aliases.
+Base name that would be used for generating containers names and network aliases. The pattern is `${basename}-${i}` where *${i}* is the number of instance, for example: `project-1`.
 
 ##### networks
 
@@ -136,7 +136,7 @@ Array or string of networks that would be used to run containers.
 ```sh
 images=("project")
 ```
-Array or string declaring image tags, the first value would be used for running containers, others are just additional tags if you need them. If no value were assigned, `${basename}` would be used for image name.
+Array or string declaring image tags, the first value would be used to refer working containers, others are just additional tags if you need them. If no value were assigned, `${basename}` would be used for image name.
 
 ##### instances
 
