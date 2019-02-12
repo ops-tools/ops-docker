@@ -12,11 +12,11 @@ The reasons are:
 
   - You don't have resources for running management nodes
   - You don't want to get orchestrators overhead in your system
-  - You want to control the whole environment up to plain docker commands
+  - You want to control the whole environment down to plain docker commands
   - You don't like to rely on complex tools in production and good to go with bash
   - You don't have experience with all that DevOps stuff and need something that just works
-  - Your project's just too small to imagine it requires Google's infrastructure to run
-  - You tell me
+  - Your project is just too small to imagine it requires Google's infrastructure to run
+  - You tell me why
 
 The philosophy behind ops-docker is to be an alternative to all the complex tools and staying sanely small, easy to use and configurable so it could be used in small to medium-sized projects without rising operational costs.
 
@@ -61,11 +61,11 @@ ops-docker commands are basically higher-level abstractions for plain docker com
 
 For example.
 
-`ops-docker -c conf/docker.cfg -l build deploy` – will build image on local machine and deploy it to the same machine.
+`ops-docker -c conf/docker.cfg -l build deploy` – will build the image on the local machine and deploy it on the same machine.
 
-`ops-docker -c conf/docker.cfg rollout` – will build image and transfer it from local machine to remotes, then run containers from this image.
+`ops-docker -c conf/docker.cfg rollout` – will build the image and transfer it from the local machine to remotes, then run containers from this image.
 
-`ops-docker -c conf/dockre.cfg -l build transport` – will build and transport new image to remotes, but not start it now.
+`ops-docker -c conf/dockre.cfg -l build transport` – will build and transport the new image to remotes, but not start it now.
 
 #### build
 
@@ -105,7 +105,7 @@ Path to configuration file.
 
 #### -l, --local
 
-Switch for forcing local running of commands (default is remote). For simple schemes like *build machine* -> *production machine* you wants `-l` for `build` and `transport` commands, but not for `prepare` and `launch`.
+Switch for forcing local running of commands (default is remote). For simple deploy schemes like *build machine* -> *production machine* you wants `-l` for `build` and `transport` commands, but not for `prepare` and `launch`.
 
 #### -h, --help
 
@@ -143,7 +143,7 @@ Array or string declaring image tags, the first value would be used to refer wor
 ```sh
 instances=1
 ```
-The number of containers you need to run.
+The number of containers you want to run.
 
 ##### remotes
 
@@ -164,7 +164,6 @@ network_create_options=(
   "--subnet 10.0.0.1/24"
 )
 ```
-
 Options that would be passed to [docker network create](https://docs.docker.com/engine/reference/commandline/network_create/) command when it's called.
 
 ##### network_connect_options
@@ -175,7 +174,6 @@ network_connect_options=(
   "--ip 10.0.0.254"
 )
 ```
-
 Options that would be passed to [docker network connect](https://docs.docker.com/engine/reference/commandline/network_connect/) command when it's called.
 
 ##### build_options
@@ -186,7 +184,6 @@ build_options=(
   "--build-arg foo=bar"
 )
 ```
-
 Options that would be passed to [docker build](https://docs.docker.com/engine/reference/commandline/build/) command when it's called.
 
 ##### build_args
@@ -204,7 +201,6 @@ create_options=(
   "-v www:/var/www"
 )
 ```
-
 Options that would be passed to [docker create](https://docs.docker.com/engine/reference/commandline/create/) command when it's called.
 
 ##### create_args
@@ -222,7 +218,6 @@ start_options=(
   "--interactive"
 )
 ```
-
 Options that would be passed to [docker start](https://docs.docker.com/engine/reference/commandline/start/) command when it's called.
 
 ##### start_sleep
