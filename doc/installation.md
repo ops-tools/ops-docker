@@ -35,13 +35,20 @@ List of runtime dependencies.
 
 Follow next guides for installing dependencies in your operating system if they're not already there.
 
-### Debian 9 stretch or later
+### Debian 9 Stretch or later
 
 Run as root.
 
 ```sh
 apt update
 apt install bash sed tar openssh openssl rsync docker.io
+```
+
+### Ubuntu 18.04 LTS or later
+
+```
+sudo apt update
+sudo apt install bash sed tar openssh openssl rsync docker.io
 ```
 
 ### Docker
