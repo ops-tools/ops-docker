@@ -458,8 +458,8 @@ Configuration file was not found: -c ${_config}\
 
   _work_image="$(docker image inspect \
     -f '{{.Id}}' "${images[0]}" | cut -d ':' -f 2)"
-  _work_script="$(openssl dgst -sha256 "${_script}" | cut -d ' ' -f 2)"
-  _work_config="$(openssl dgst -sha256 "${_config}" | cut -d ' ' -f 2)"
+  _work_script="$(openssl sha256 "${_script}" | cut -d ' ' -f 2)"
+  _work_config="$(openssl sha256 "${_config}" | cut -d ' ' -f 2)"
 
   if [[ "${remotes[@]}" && ! "${_force_local}" = true ]]; then
     _exec_remote
