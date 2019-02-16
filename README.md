@@ -115,6 +115,18 @@ Standard option tells that you want to see usage note and immediately exit.
 
 A configuration file is a plain bash source include. Variables can be split to *Base settings*, *Docker control settings* and *Hooks* functions.
 
+Look at the basic example of config for a web server like [nginx](https://hub.docker.com/_/nginx).
+
+```sh
+basename="web-server"
+networks=("bridge")
+remotes=("deploy@production:/home/deploy")
+create_options=(
+  "-p 80:80"
+  "-v web-server-data:/var/www"
+)
+```
+
 #### Base settings
 
 ##### basename
