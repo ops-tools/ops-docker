@@ -393,8 +393,10 @@ _parse_args() {
   until [[ -z "$@" ]]; do
     case "$@" in
       -c*|--config*)
-        _config="$2"
-        shift
+        if [[ "$2" ]]; then
+          _config="$2"
+          shift
+        fi
         shift
         ;;
 
