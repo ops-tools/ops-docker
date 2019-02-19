@@ -32,7 +32,7 @@ You likely have all of these programs already installed when using modern Linux 
 
 ## Usage
 
-Running `ops-docker` without parameters or with `--help` switch will show you short usage message.
+Running `ops-docker` without parameters or with `--help` switch will show you a short usage message.
 
 ```
 $ ops-docker
