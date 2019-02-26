@@ -442,7 +442,7 @@ main() {
 
   if [[ "${_help}" = true || -z "${_commands[@]}" ]]; then
     _print_help
-    exit
+    exit 1
   fi
 
   if [[ ! "${_config}" || ! -f "${_config}" ]]; then
