@@ -446,9 +446,7 @@ main() {
   fi
 
   if [[ ! "${_config}" || ! -f "${_config}" ]]; then
-    echo "\
-Configuration file was not found: -c ${_config}\
-    "
+    echo "Configuration file was not found: -c ${_config}"
     exit 1
   fi
 
