@@ -3,12 +3,12 @@
 __basepath="$(dirname "${BASH_SOURCE[0]}")"
 __target="${__basepath}/../../ops-docker"
 
-source "${__basepath}/__util.sh"
+######
 
-# Should parse config options
 echo "Should parse config options"
 
-## Should parse -c option
+### Should parse -c option
+
 echo -n "  -c conf/local.cfg"
 
 source "${__target}"
@@ -20,7 +20,8 @@ else
   __fail
 fi
 
-## Should parse --config option
+### Should parse --config option
+
 echo -n "  --config conf/local.cfg"
 
 source "${__target}"
@@ -34,10 +35,12 @@ fi
 
 echo
 
-# Should parse local options
+######
+
 echo "Should parse local options"
 
-## Should parse -l option
+### Should parse -l option
+
 echo -n "  -l"
 
 source "${__target}"
@@ -49,7 +52,8 @@ else
   __fail
 fi
 
-## Should parse --local option
+### Should parse --local option
+
 echo -n "  --local"
 
 source "${__target}"
@@ -63,10 +67,12 @@ fi
 
 echo
 
-# Should parse help options
+######
+
 echo "Should parse help options"
 
-## Should parse -h option
+### Should parse -h option
+
 echo -n "  -h"
 
 source "${__target}"
@@ -78,7 +84,8 @@ else
   __fail
 fi
 
-## Should parse --help option
+### Should parse --help option
+
 echo -n "  --help"
 
 source "${__target}"
@@ -92,10 +99,12 @@ fi
 
 echo
 
-# Should parse commands
+######
+
 echo "Should parse commands"
 
-## Should parse supported commands
+### Should parse supported commands
+
 echo -n "  transport prepare launch"
 
 source "${__target}"
@@ -107,7 +116,8 @@ else
   __fail
 fi
 
-## Should parse commands preceded with options
+### Should parse commands preceded with options
+
 echo -n "  -c conf/local.cfg transport prepare launch"
 
 source "${__target}"
@@ -119,7 +129,8 @@ else
   __fail
 fi
 
-## Should parse commands mixed with options
+### Should parse commands mixed with options
+
 echo -n "  transport prepare -c conf/local.cfg launch"
 
 source "${__target}"
@@ -131,7 +142,8 @@ else
   __fail
 fi
 
-## Should parse commands followed with options
+### Should parse commands followed with options
+
 echo -n "  transport prepare launch -c conf/local.cfg"
 
 source "${__target}"
@@ -143,7 +155,8 @@ else
   __fail
 fi
 
-## Should parse only supported commands
+### Should parse only supported commands
+
 echo -n "  foo transport xx bar prepare launchME launch"
 
 source "${__target}"
@@ -157,10 +170,12 @@ fi
 
 echo
 
-# Should correctly parse some mess
+######
+
 echo "Should correctly parse some mess"
 
-## Should parse mixed supported and unsupported options and commands
+### Should parse mixed supported and unsupported options and commands
+
 echo -n "  -x foo -c bar prepare baz 123 -z"
 
 source "${__target}"
@@ -171,5 +186,7 @@ if [[ "${_config}" = "bar" && "${_commands[@]}" = "prepare" ]]; then
 else
   __fail
 fi
+
+######
 
 echo
