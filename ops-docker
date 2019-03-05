@@ -324,8 +324,6 @@ _exec() {
     _commands=("${_commands[@]:1}")
     ${cmd}
   done
-
-  exit $?
 }
 
 _exec_remote() {
@@ -359,10 +357,8 @@ _exec_remote() {
   wait ${pids[@]}
 
   for pid in "${pids[@]}"; do
-    wait "${pid}" || exit $?
+    wait "${pid}" || return
   done
-
-  exit $?
 }
 
 _print_help() {
@@ -442,12 +438,12 @@ main() {
 
   if [[ "${_help}" = true || -z "${_commands[@]}" ]]; then
     _print_help
-    exit 1
+    return 1
   fi
 
   if [[ ! "${_config}" || ! -f "${_config}" ]]; then
     echo "Configuration file was not found: -c ${_config}"
-    exit 1
+    return 1
   fi
 
   source "${_config}"
