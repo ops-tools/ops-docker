@@ -57,6 +57,54 @@ fi
 
 #####
 
+echo -n "Should exec commands remotely if config has remotes and no -l switch set"
+
+source "${__target}"
+
+_exec_remote() {
+  __ok
+}
+
+_exec() {
+  __fail
+}
+
+main -c test/conf/docker.cfg build
+
+#####
+
+echo -n "Should exec commands locally if no remotes in config"
+
+source "${__target}"
+
+_exec() {
+  __ok
+}
+
+_exec_remote() {
+  __fail
+}
+
+main -c test/conf/local.cfg build
+
+#####
+
+echo -n "Should exec commands locally if -l switch is on"
+
+source "${__target}"
+
+_exec() {
+  __ok
+}
+
+_exec_remote() {
+  __fail
+}
+
+main -c test/conf/docker.cfg -l build
+
+#####
+
 echo -n "Should test main function"
 __fail
 
