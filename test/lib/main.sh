@@ -57,7 +57,7 @@ fi
 
 #####
 
-echo -n "Should exec commands remotely if config has remotes and no -l switch set"
+echo -n "Should exec commands remotely if config has remotes and no -l switch is set"
 
 source "${__target}"
 
@@ -105,8 +105,42 @@ main -c test/conf/docker.cfg -l build
 
 #####
 
-echo -n "Should test main function"
-__fail
+echo -n "Should resolve id for working image"
+
+source "${__target}"
+main -c test/conf/docker.cfg -l build &>/dev/null
+
+if [[ "${_work_image}" =~ ^[a-z0-9]+$ && "${#_work_image}" == 64 ]]; then
+  __ok
+else
+  __fail
+fi
+
+#####
+
+echo -n "Should resolve id for working script"
+
+source "${__target}"
+main -c test/conf/docker.cfg -l build &>/dev/null
+
+if [[ "${_work_script}" =~ ^[a-z0-9]+$ && "${#_work_script}" == 64 ]]; then
+  __ok
+else
+  __fail
+fi
+
+#####
+
+echo -n "Should resolve id for working config"
+
+source "${__target}"
+main -c test/conf/docker.cfg -l build &>/dev/null
+
+if [[ "${_work_config}" =~ ^[a-z0-9]+$ &&"${#_work_config}" == 64 ]]; then
+  __ok
+else
+  __fail
+fi
 
 ######
 
