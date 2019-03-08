@@ -12,7 +12,7 @@
   },
   "keywords": [
     "docker",
-    "deploy"
+    "deploy",
     "bash",
     "ops",
     "devops",
@@ -25,6 +25,6 @@
   },
   "scripts": {
     "start": "./ops-docker",
-    "test": "tests/all"
+    "test": "test/all"
   }
 }
