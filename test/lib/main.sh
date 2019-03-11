@@ -3,12 +3,17 @@
 __basepath="$(dirname "${BASH_SOURCE[0]}")"
 __target="${__basepath}/../../ops-docker"
 
+__noop() { :; }
+
 #####
 
 echo -n "Should exit with error code when no config option passed"
 
 source "${__target}"; set +e
-main build &>/dev/null
+
+_commands=("__noop")
+
+main &>/dev/null
 
 if [[ "$?" > 0 ]]; then
   __ok
@@ -21,7 +26,10 @@ fi
 echo -n "Should exit with error code when no config file found"
 
 source "${__target}"; set +e
-main -c foo/bar build &>/dev/null
+
+_commands=("__noop")
+
+main -c foo/bar &>/dev/null
 
 if [[ "$?" > 0 ]]; then
   __ok
@@ -34,7 +42,11 @@ fi
 echo -n "Should load config as source"
 
 source "${__target}"; set +e
-main -c test/conf/docker.cfg build &>/dev/null
+
+_exec_remote() { :; }
+_commands=("__noop")
+
+main -c test/conf/docker.cfg &>/dev/null
 
 if [[ "${basename}" == "ops-docker-test" ]]; then
   __ok
@@ -47,7 +59,11 @@ fi
 echo -n "Should set image name to basename when omitted in config"
 
 source "${__target}"; set +e
-main -c test/conf/docker.cfg build &>/dev/null
+
+_exec_remote() { :; }
+_commands=("__noop")
+
+main -c test/conf/docker.cfg &>/dev/null
 
 if [[ "${images[0]}" == "${basename}" ]]; then
   __ok
@@ -69,7 +85,9 @@ _exec() {
   __fail
 }
 
-main -c test/conf/docker.cfg build
+_commands=("__noop")
+
+main -c test/conf/docker.cfg
 
 #####
 
@@ -85,7 +103,9 @@ _exec_remote() {
   __fail
 }
 
-main -c test/conf/local.cfg build
+_commands=("__noop")
+
+main -c test/conf/local.cfg
 
 #####
 
@@ -101,14 +121,20 @@ _exec_remote() {
   __fail
 }
 
-main -c test/conf/docker.cfg -l build
+_commands=("__noop")
+
+main -c test/conf/docker.cfg -l
 
 #####
 
 echo -n "Should resolve id for working image"
 
 source "${__target}"
-main -c test/conf/docker.cfg -l build &>/dev/null
+
+_exec_remote() { :; }
+_commands=("__noop")
+
+main -c test/conf/docker.cfg &>/dev/null
 
 if [[ "${_work_image}" =~ ^[a-z0-9]+$ && "${#_work_image}" == 64 ]]; then
   __ok
@@ -121,7 +147,11 @@ fi
 echo -n "Should resolve id for working script"
 
 source "${__target}"
-main -c test/conf/docker.cfg -l build &>/dev/null
+
+_exec_remote() { :; }
+_commands=("__noop")
+
+main -c test/conf/docker.cfg &>/dev/null
 
 if [[ "${_work_script}" =~ ^[a-z0-9]+$ && "${#_work_script}" == 64 ]]; then
   __ok
@@ -134,7 +164,11 @@ fi
 echo -n "Should resolve id for working config"
 
 source "${__target}"
-main -c test/conf/docker.cfg -l build &>/dev/null
+
+_exec_remote() { :; }
+_commands=("__noop")
+
+main -c test/conf/docker.cfg &>/dev/null
 
 if [[ "${_work_config}" =~ ^[a-z0-9]+$ &&"${#_work_config}" == 64 ]]; then
   __ok
