@@ -322,7 +322,7 @@ _parse_uri() {
 _exec() {
   local cmd=""; for cmd in "${_commands[@]}"; do
     _commands=("${_commands[@]:1}")
-    ${cmd}
+    ${cmd} || return $?
   done
 }
 
