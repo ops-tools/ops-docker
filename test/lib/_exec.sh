@@ -34,8 +34,50 @@ fi
 
 ######
 
-echo -n "Should test _exec function"
-__fail
+echo -n "Should return an error code when one of the commands failed"
+
+source "${__target}"; set +e
+
+__foo() { :; }
+
+__bar() {
+  command_not_exists
+}
+
+_commands=("__foo" "__bar")
+_exec &>/dev/null
+
+if [[ "$?" > 0 ]]; then
+  __ok
+else
+  __fail
+fi
+
+######
+
+echo -n "Should not call next command if previous failed"
+
+source "${__target}"; set +e
+
+__tmp=""
+
+__foo() {
+  __tmp="foo"
+  command_not_exists
+}
+
+__bar() {
+  __tmp="bar"
+}
+
+_commands=("__foo" "__bar")
+_exec &>/dev/null
+
+if [[ "${__tmp}" == "foo" ]]; then
+  __ok
+else
+  __fail
+fi
 
 ######
 
