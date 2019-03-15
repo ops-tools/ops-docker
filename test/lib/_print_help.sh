@@ -5,7 +5,7 @@ __target="${__basepath}/../../ops-docker"
 
 ######
 
-echo -n "Should print help message"
+echo -n "Should print usage message"
 
 source "${__target}"
 

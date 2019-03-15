@@ -7,7 +7,7 @@ __noop() { :; }
 
 #####
 
-echo -n "Should exit with error code when no config option passed"
+echo -n "Should exit with an error code when no config option passed"
 
 source "${__target}"; set +e
 
@@ -23,7 +23,7 @@ fi
 
 #####
 
-echo -n "Should exit with error code when no config file found"
+echo -n "Should exit with an error code when no config file found"
 
 source "${__target}"; set +e
 
@@ -56,7 +56,7 @@ fi
 
 #####
 
-echo -n "Should set image name to basename when omitted in config"
+echo -n "Should set image name to basename when omitted in the config"
 
 source "${__target}"; set +e
 
@@ -91,7 +91,7 @@ main -c test/conf/docker.cfg
 
 #####
 
-echo -n "Should exec commands locally if no remotes in config"
+echo -n "Should exec commands locally if no remotes in the config"
 
 source "${__target}"
 
@@ -127,7 +127,7 @@ main -c test/conf/docker.cfg -l
 
 #####
 
-echo -n "Should resolve id for working image"
+echo -n "Should resolve id for a working image"
 
 source "${__target}"
 
@@ -144,7 +144,7 @@ fi
 
 #####
 
-echo -n "Should resolve id for working script"
+echo -n "Should resolve id for a working script"
 
 source "${__target}"
 
@@ -161,7 +161,7 @@ fi
 
 #####
 
-echo -n "Should resolve id for working config"
+echo -n "Should resolve id for a working config"
 
 source "${__target}"
 
