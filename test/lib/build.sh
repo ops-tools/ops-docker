@@ -2,8 +2,30 @@
 
 __basepath="$(dirname "${BASH_SOURCE[0]}")"
 __target="${__basepath}/../../ops-docker"
+__config="${__basepath}/../conf/docker.cfg"
 
 ######
+
+echo -n "Should call pre_build hook"
+
+source "${__target}"
+source "${__config}"
+
+__hook=""
+
+pre_build() {
+  __hook="pre"
+}
+
+build &>/dev/null
+
+if [[ "${__hook}" == "pre" ]]; then
+  __ok
+else
+  __fail
+fi
+
+#####
 
 echo -n "Should test build function"
 __fail
