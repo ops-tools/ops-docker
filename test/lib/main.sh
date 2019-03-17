@@ -127,24 +127,7 @@ main -c test/conf/docker.cfg -l
 
 #####
 
-echo -n "Should resolve id for a working image"
-
-source "${__target}"
-
-_exec_remote() { :; }
-_commands=("__noop")
-
-main -c test/conf/docker.cfg &>/dev/null
-
-if [[ "${_work_image}" =~ ^[a-z0-9]+$ && "${#_work_image}" == 64 ]]; then
-  __ok
-else
-  __fail
-fi
-
-#####
-
-echo -n "Should resolve id for a working script"
+echo -n "Should resolve id for the working script"
 
 source "${__target}"
 
@@ -161,7 +144,7 @@ fi
 
 #####
 
-echo -n "Should resolve id for a working config"
+echo -n "Should resolve id for the working config"
 
 source "${__target}"
 

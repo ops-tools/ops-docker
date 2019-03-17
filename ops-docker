@@ -40,7 +40,6 @@ _workdir=".ops-docker"
 _scriptsdir="${_workdir}/scripts"
 _configsdir="${_workdir}/configs"
 _imagesdir="${_workdir}/images"
-_work_image=""
 _work_script=""
 _work_config=""
 _force_local=false
@@ -79,20 +78,23 @@ build() {
 }
 
 transport() {
-  local args user_host port path pid pids
+  local image_id args user_host port path pid pids
 
   echo "Transporting \`${images[0]}' image to remotes"
 
+  image_id="$(docker image inspect \
+    -f '{{.Id}}' "${images[0]}" | cut -d ':' -f 2)"
+
   mkdir -p "${_scriptsdir}" "${_configsdir}"
-  mkdir -p "${_imagesdir}/${_work_image}"
+  mkdir -p "${_imagesdir}/${image_id}"
 
   cp -u "${_script}" "${_scriptsdir}/${_work_script}"
   cp -u "${_config}" "${_configsdir}/${_work_config}"
 
-  docker save "${_work_image}" | tar \
+  docker save "${image_id}" | tar \
     --keep-newer-files \
     --warning=no-ignore-newer \
-    -C "${_imagesdir}/${_work_image}" \
+    -C "${_imagesdir}/${image_id}" \
     -xf \
     -
 
@@ -104,14 +106,14 @@ transport() {
 
     (
       rsync -avzRP -e "ssh -p ${port}" \
-        "${_imagesdir}/${_work_image}" \
+        "${_imagesdir}/${image_id}" \
         "${_scriptsdir}/${_work_script}" \
         "${_configsdir}/${_work_config}" \
         "${user_host}:${path}" && \
       ssh \
         -p "${port}" \
         "${user_host}" \
-        "bash -lc 'tar -cC "${path}/${_imagesdir}/${_work_image}" . | docker load'"
+        "bash -lc 'tar -cC "${path}/${_imagesdir}/${image_id}" . | docker load'"
     ) &
 
     pids+=("$!")
@@ -168,7 +170,7 @@ prepare() {
     fi
 
     cmd+=("${_create_options[@]}")
-    cmd+=("${_work_image}")
+    cmd+=("${images[0]}")
     cmd+=("${create_args[@]}")
 
     pre_create
@@ -455,8 +457,6 @@ main() {
     images=("${basename}")
   fi
 
-  _work_image="$(docker image inspect \
-    -f '{{.Id}}' "${images[0]}" | cut -d ':' -f 2)"
   _work_script="$(openssl sha256 "${_script}" | cut -d ' ' -f 2)"
   _work_config="$(openssl sha256 "${_config}" | cut -d ' ' -f 2)"
 
