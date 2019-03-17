@@ -141,10 +141,13 @@ prepare() {
 
   docker rm -f ${_containers_next[@]} 2> /dev/null || true
 
-  local re_publish='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?[[:space:]]*([0-9.]*:)?([0-9]+)'
+  # -p|--publish [IP:]port
+  local publish_re='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?.*([[:space:]]|:)([0-9]+):'
 
+  local _create_options
   local i=0 n=0; for i in "${!_containers_next[@]}"; do
     n=$((i+1))
+    _create_options=("${create_options[@]}")
 
     cmd=(
       "docker create"
@@ -159,12 +162,12 @@ prepare() {
       cmd+=("--net-alias ${basename}-$n")
     fi
 
-    # -p|--publish [IP:]port
-    if [[ "${create_options[@]}" =~ ${re_publish} ]]; then
-      create_options=("${create_options[@]/${BASH_REMATCH[4]}/$((${BASH_REMATCH[4]}+1))}")
+    # Match and increment local port number
+    if [[ "${_create_options[@]}" =~ ${publish_re} ]]; then
+      _create_options=("${_create_options[@]/${BASH_REMATCH[4]}/$((${BASH_REMATCH[4]}+$i))}")
     fi
 
-    cmd+=("${create_options[@]}")
+    cmd+=("${_create_options[@]}")
     cmd+=("${_work_image}")
     cmd+=("${create_args[@]}")
 
