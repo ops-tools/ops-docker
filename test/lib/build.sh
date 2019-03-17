@@ -25,6 +25,27 @@ else
   __fail
 fi
 
+######
+
+echo -n "Should call post_build hook"
+
+source "${__target}"
+source "${__config}"
+
+__hook=""
+
+post_build() {
+  __hook="post"
+}
+
+build &>/dev/null
+
+if [[ "${__hook}" == "post" ]]; then
+  __ok
+else
+  __fail
+fi
+
 #####
 
 echo -n "Should test build function"
