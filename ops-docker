@@ -122,7 +122,7 @@ transport() {
   wait ${pids[@]}
 
   for pid in "${pids[@]}"; do
-    wait "${pid}" || return $?
+    wait "${pid}" || return
   done
 }
 
@@ -327,7 +327,12 @@ _parse_uri() {
 _exec() {
   local cmd=""; for cmd in "${_commands[@]}"; do
     _commands=("${_commands[@]:1}")
-    ${cmd} || return $?
+
+    ${cmd} || return
+
+    if [[ "${cmd}" == "_exec_remote" ]]; then
+      break
+    fi
   done
 }
 

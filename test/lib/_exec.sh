@@ -81,4 +81,33 @@ fi
 
 ######
 
+echo -n "Should not call next command after context switch"
+
+source "${__target}"; set +e
+
+__tmp=""
+
+__foo() {
+  __tmp="foo"
+}
+
+_exec_remote() {
+  __tmp="_exec_remote"
+}
+
+__bar() {
+  __tmp="bar"
+}
+
+_commands=("__foo" "_exec_remote" "__bar")
+_exec &>/dev/null
+
+if [[ "${__tmp}" == "_exec_remote" ]]; then
+  __ok
+else
+  __fail
+fi
+
+######
+
 echo
