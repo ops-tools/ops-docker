@@ -46,10 +46,32 @@ else
   __fail
 fi
 
-#####
+######
 
-echo -n "Should test build function"
-__fail
+echo -n "Should set all image tags"
+
+source "${__target}"
+source "${__config}"
+
+images=(
+  "ops-docker-test-first"
+  "ops-docker-test-next"
+  "ops-docker-test-rest"
+)
+
+build &>/dev/null
+
+__images=($(docker images -f 'reference=ops-docker-test-*' --format '{{.Repository}}'))
+
+if [[ "${__images[@]}" =~ "ops-docker-test-first" &&
+      "${__images[@]}" =~ "ops-docker-test-next" &&
+      "${__images[@]}" =~ "ops-docker-test-rest" ]]; then
+  __ok
+else
+  __fail
+fi
+
+docker rmi -f ${__images[@]} &>/dev/null
 
 ######
 
