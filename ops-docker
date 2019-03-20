@@ -156,7 +156,7 @@ prepare() {
       "--restart unless-stopped"
       "--name ${_containers_next[$i]}"
       "--network ${networks[0]}"
-      "-e 'OPS_INSTANCE=${n}'"
+      "-e 'OPS_INSTANCE=$n'"
     )
 
     # network-scoped alias is supported only in user defined networks
@@ -303,8 +303,8 @@ _define() {
 
   _containers_next=()
   local i=1; while (( ${#_containers_next[@]} < ${instances} )); do
-    if [[ "${_containers[@]}" != *"${basename}-${i}"* ]]; then
-      _containers_next+=("${basename}-${i}")
+    if [[ "${_containers[@]}" != *"${basename}-$i"* ]]; then
+      _containers_next+=("${basename}-$i")
     fi
     i=$((i+1))
   done
