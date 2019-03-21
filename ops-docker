@@ -60,7 +60,8 @@ build() {
 
   cmd=("docker build")
 
-  local image=""; for image in "${images[@]}"; do
+  local image="";
+  for image in "${images[@]}"; do
     cmd+=("-t ${image}")
   done
 
@@ -98,7 +99,8 @@ transport() {
     -xf \
     -
 
-  local uri=""; for uri in "${remotes[@]}"; do
+  local uri="";
+  for uri in "${remotes[@]}"; do
     args=($(_parse_uri "${uri}"))
     user_host="${args[0]}"
     port="${args[1]}"
@@ -133,7 +135,8 @@ prepare() {
 
   _define
 
-  local network=""; for network in "${networks[@]}"; do
+  local network="";
+  for network in "${networks[@]}"; do
     if [[ ! "${_networks[@]}" = *"${network}"* ]]; then
       docker network create \
         ${network_create_options[@]} \
@@ -147,7 +150,8 @@ prepare() {
   local publish_re='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?.*([[:space:]]|:)([0-9]+):'
 
   local _create_options
-  local i=0 n=0; for i in "${!_containers_next[@]}"; do
+  local i=0 n=0;
+  for i in "${!_containers_next[@]}"; do
     n=$((i+1))
     _create_options=("${create_options[@]}")
 
@@ -195,7 +199,8 @@ launch() {
     return 1
   fi
 
-  local name=""; for name in "${_containers_running[@]:${instances}}"; do
+  local name="";
+  for name in "${_containers_running[@]:${instances}}"; do
     docker stop "${name}"
   done
 
@@ -230,7 +235,8 @@ rollback() {
     return 1
   fi
 
-  local i=0; for i in "${!_containers_running[@]}"; do
+  local i=0;
+  for i in "${!_containers_running[@]}"; do
     docker stop "${_containers_running[$i]}"
 
     if [[ "${_containers_exited[$i]}" ]]; then
@@ -274,35 +280,40 @@ _define() {
   _networks=($(docker network ls --format '{{.Name}}'))
 
   _containers=()
-  local name=""; for name in "${containers_all[@]}"; do
+  local name="";
+  for name in "${containers_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers+=("${name}")
     fi
   done
 
   _containers_running=()
-  local name=""; for name in "${containers_running_all[@]}"; do
+  local name="";
+  for name in "${containers_running_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers_running+=("${name}")
     fi
   done
 
   _containers_created=()
-  local name=""; for name in "${containers_created_all[@]}"; do
+  local name="";
+  for name in "${containers_created_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers_created+=("${name}")
     fi
   done
 
   _containers_exited=()
-  local name=""; for name in "${containers_exited_all[@]}"; do
+  local name="";
+  for name in "${containers_exited_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers_exited+=("${name}")
     fi
   done
 
   _containers_next=()
-  local i=1; while (( ${#_containers_next[@]} < ${instances} )); do
+  local i=1;
+  while (( ${#_containers_next[@]} < ${instances} )); do
     if [[ "${_containers[@]}" != *"${basename}-$i"* ]]; then
       _containers_next+=("${basename}-$i")
     fi
@@ -325,7 +336,8 @@ _parse_uri() {
 }
 
 _exec() {
-  local cmd=""; for cmd in "${_commands[@]}"; do
+  local cmd="";
+  for cmd in "${_commands[@]}"; do
     _commands=("${_commands[@]:1}")
 
     ${cmd} || return
@@ -339,7 +351,8 @@ _exec() {
 _exec_remote() {
   local cmd args pid pids
 
-  local uri=""; for uri in "${remotes[@]}"; do
+  local uri="";
+  for uri in "${remotes[@]}"; do
     args=($(_parse_uri "${uri}"))
     user_host="${args[0]}"
     port="${args[1]}"
@@ -427,7 +440,8 @@ _parse_args() {
     esac
   done
 
-  local arg=""; for arg in "${args[@]}"; do
+  local arg="";
+  for arg in "${args[@]}"; do
     if [[ "build transport prepare launch rollback" = *"${arg}"* ]]; then
       _commands+=("${arg}")
     fi
