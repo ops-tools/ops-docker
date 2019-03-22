@@ -40,7 +40,6 @@ _workdir=".ops-docker"
 _scriptsdir="${_workdir}/scripts"
 _configsdir="${_workdir}/configs"
 _imagesdir="${_workdir}/images"
-_work_image=""
 _work_script=""
 _work_config=""
 _force_local=false
@@ -61,7 +60,8 @@ build() {
 
   cmd=("docker build")
 
-  local image=""; for image in "${images[@]}"; do
+  local image="";
+  for image in "${images[@]}"; do
     cmd+=("-t ${image}")
   done
 
@@ -79,24 +79,28 @@ build() {
 }
 
 transport() {
-  local args user_host port path pid pids
+  local image_id args user_host port path pid pids
 
   echo "Transporting \`${images[0]}' image to remotes"
 
+  image_id="$(docker image inspect \
+    -f '{{.Id}}' "${images[0]}" | cut -d ':' -f 2)"
+
   mkdir -p "${_scriptsdir}" "${_configsdir}"
-  mkdir -p "${_imagesdir}/${_work_image}"
+  mkdir -p "${_imagesdir}/${image_id}"
 
   cp -u "${_script}" "${_scriptsdir}/${_work_script}"
   cp -u "${_config}" "${_configsdir}/${_work_config}"
 
-  docker save "${images[@]}" | tar \
+  docker save "${image_id}" | tar \
     --keep-newer-files \
     --warning=no-ignore-newer \
-    -C "${_imagesdir}/${_work_image}" \
+    -C "${_imagesdir}/${image_id}" \
     -xf \
     -
 
-  local uri=""; for uri in "${remotes[@]}"; do
+  local uri="";
+  for uri in "${remotes[@]}"; do
     args=($(_parse_uri "${uri}"))
     user_host="${args[0]}"
     port="${args[1]}"
@@ -104,14 +108,14 @@ transport() {
 
     (
       rsync -avzRP -e "ssh -p ${port}" \
-        "${_imagesdir}/${_work_image}" \
+        "${_imagesdir}/${image_id}" \
         "${_scriptsdir}/${_work_script}" \
         "${_configsdir}/${_work_config}" \
         "${user_host}:${path}" && \
       ssh \
         -p "${port}" \
         "${user_host}" \
-        "bash -lc 'tar -cC "${path}/${_imagesdir}/${_work_image}" . | docker load'"
+        "bash -lc 'tar -cC "${path}/${_imagesdir}/${image_id}" . | docker load'"
     ) &
 
     pids+=("$!")
@@ -120,7 +124,7 @@ transport() {
   wait ${pids[@]}
 
   for pid in "${pids[@]}"; do
-    wait "${pid}" || return $?
+    wait "${pid}" || return
   done
 }
 
@@ -131,7 +135,8 @@ prepare() {
 
   _define
 
-  local network=""; for network in "${networks[@]}"; do
+  local network="";
+  for network in "${networks[@]}"; do
     if [[ ! "${_networks[@]}" = *"${network}"* ]]; then
       docker network create \
         ${network_create_options[@]} \
@@ -141,17 +146,21 @@ prepare() {
 
   docker rm -f ${_containers_next[@]} 2> /dev/null || true
 
-  local re_publish='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?[[:space:]]*([0-9.]*:)?([0-9]+)'
+  # -p|--publish [IP:]port
+  local publish_re='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?.*([[:space:]]|:)([0-9]+):'
 
-  local i=0 n=0; for i in "${!_containers_next[@]}"; do
+  local _create_options
+  local i=0 n=0;
+  for i in "${!_containers_next[@]}"; do
     n=$((i+1))
+    _create_options=("${create_options[@]}")
 
     cmd=(
       "docker create"
       "--restart unless-stopped"
       "--name ${_containers_next[$i]}"
       "--network ${networks[0]}"
-      "-e 'OPS_INSTANCE=${n}'"
+      "-e 'OPS_INSTANCE=$n'"
     )
 
     # network-scoped alias is supported only in user defined networks
@@ -159,12 +168,12 @@ prepare() {
       cmd+=("--net-alias ${basename}-$n")
     fi
 
-    # -p|--publish [IP:]port
-    if [[ "${create_options[@]}" =~ ${re_publish} ]]; then
-      create_options=("${create_options[@]/${BASH_REMATCH[4]}/$((${BASH_REMATCH[4]}+1))}")
+    # Match and increment local port number
+    if [[ "${_create_options[@]}" =~ ${publish_re} ]]; then
+      _create_options=("${_create_options[@]/${BASH_REMATCH[4]}/$((${BASH_REMATCH[4]}+$i))}")
     fi
 
-    cmd+=("${create_options[@]}")
+    cmd+=("${_create_options[@]}")
     cmd+=("${images[0]}")
     cmd+=("${create_args[@]}")
 
@@ -190,7 +199,8 @@ launch() {
     return 1
   fi
 
-  local name=""; for name in "${_containers_running[@]:${instances}}"; do
+  local name="";
+  for name in "${_containers_running[@]:${instances}}"; do
     docker stop "${name}"
   done
 
@@ -225,7 +235,8 @@ rollback() {
     return 1
   fi
 
-  local i=0; for i in "${!_containers_running[@]}"; do
+  local i=0;
+  for i in "${!_containers_running[@]}"; do
     docker stop "${_containers_running[$i]}"
 
     if [[ "${_containers_exited[$i]}" ]]; then
@@ -269,37 +280,42 @@ _define() {
   _networks=($(docker network ls --format '{{.Name}}'))
 
   _containers=()
-  local name=""; for name in "${containers_all[@]}"; do
+  local name="";
+  for name in "${containers_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers+=("${name}")
     fi
   done
 
   _containers_running=()
-  local name=""; for name in "${containers_running_all[@]}"; do
+  local name="";
+  for name in "${containers_running_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers_running+=("${name}")
     fi
   done
 
   _containers_created=()
-  local name=""; for name in "${containers_created_all[@]}"; do
+  local name="";
+  for name in "${containers_created_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers_created+=("${name}")
     fi
   done
 
   _containers_exited=()
-  local name=""; for name in "${containers_exited_all[@]}"; do
+  local name="";
+  for name in "${containers_exited_all[@]}"; do
     if [[ "${name}" =~ ^${basename}-[0-9]+$ ]]; then
       _containers_exited+=("${name}")
     fi
   done
 
   _containers_next=()
-  local i=1; while (( ${#_containers_next[@]} < ${instances} )); do
-    if [[ "${_containers[@]}" != *"${basename}-${i}"* ]]; then
-      _containers_next+=("${basename}-${i}")
+  local i=1;
+  while (( ${#_containers_next[@]} < ${instances} )); do
+    if [[ "${_containers[@]}" != *"${basename}-$i"* ]]; then
+      _containers_next+=("${basename}-$i")
     fi
     i=$((i+1))
   done
@@ -320,18 +336,23 @@ _parse_uri() {
 }
 
 _exec() {
-  local cmd=""; for cmd in "${_commands[@]}"; do
+  local cmd="";
+  for cmd in "${_commands[@]}"; do
     _commands=("${_commands[@]:1}")
-    ${cmd}
-  done
 
-  exit $?
+    ${cmd} || return
+
+    if [[ "${cmd}" == "_exec_remote" ]]; then
+      break
+    fi
+  done
 }
 
 _exec_remote() {
   local cmd args pid pids
 
-  local uri=""; for uri in "${remotes[@]}"; do
+  local uri="";
+  for uri in "${remotes[@]}"; do
     args=($(_parse_uri "${uri}"))
     user_host="${args[0]}"
     port="${args[1]}"
@@ -359,10 +380,8 @@ _exec_remote() {
   wait ${pids[@]}
 
   for pid in "${pids[@]}"; do
-    wait "${pid}" || exit $?
+    wait "${pid}" || return
   done
-
-  exit $?
 }
 
 _print_help() {
@@ -421,7 +440,8 @@ _parse_args() {
     esac
   done
 
-  local arg=""; for arg in "${args[@]}"; do
+  local arg="";
+  for arg in "${args[@]}"; do
     if [[ "build transport prepare launch rollback" = *"${arg}"* ]]; then
       _commands+=("${arg}")
     fi
@@ -442,12 +462,12 @@ main() {
 
   if [[ "${_help}" = true || -z "${_commands[@]}" ]]; then
     _print_help
-    exit 1
+    return 1
   fi
 
   if [[ ! "${_config}" || ! -f "${_config}" ]]; then
     echo "Configuration file was not found: -c ${_config}"
-    exit 1
+    return 1
   fi
 
   source "${_config}"
@@ -456,8 +476,6 @@ main() {
     images=("${basename}")
   fi
 
-  _work_image="$(docker image inspect \
-    -f '{{.Id}}' "${images[0]}" | cut -d ':' -f 2)"
   _work_script="$(openssl sha256 "${_script}" | cut -d ' ' -f 2)"
   _work_config="$(openssl sha256 "${_config}" | cut -d ' ' -f 2)"
 
