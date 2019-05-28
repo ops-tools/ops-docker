@@ -115,7 +115,10 @@ transport() {
       ssh \
         -p "${port}" \
         "${user_host}" \
-        "bash -lc 'tar -cC "${path}/${_imagesdir}/${image_id}" . | docker load'"
+        "bash -lc ' \
+          tar -cC "${path}/${_imagesdir}/${image_id}" . | docker load && \
+          for tag in \"${images[@]}\"; do docker tag ${image_id} \${tag}; done \
+        '"
     ) &
 
     pids+=("$!")
