@@ -14,6 +14,7 @@ basename="project"
 networks=("bridge")
 images=()
 instances=1
+strategy="stop-start"
 remotes=()
 
 ## Docker control settings
@@ -31,6 +32,8 @@ pre_build() { :; }
 post_build() { :; }
 pre_create() { :; }
 post_create() { :; }
+pre_stop() { :; }
+post_stop() { :; }
 pre_start() { :; }
 post_start() { :; }
 
@@ -47,6 +50,7 @@ _help=""
 _config=""
 _commands=()
 _networks=()
+_ports=()
 _containers=()
 _containers_created=()
 _containers_running=()
@@ -153,6 +157,7 @@ prepare() {
   local publish_re='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?.*([[:space:]]|:)([0-9]+):'
 
   local _create_options
+  local port next_port bound_port
   local i=0 n=0;
   for i in "${!_containers_next[@]}"; do
     n=$((i+1))
@@ -173,7 +178,19 @@ prepare() {
 
     # Match and increment local port number
     if [[ "${_create_options[@]}" =~ ${publish_re} ]]; then
-      _create_options=("${_create_options[@]/${BASH_REMATCH[4]}/$((${BASH_REMATCH[4]}+$i))}")
+      port="${BASH_REMATCH[4]}"
+      next_port="$((${port}+$i))"
+
+      if [[ "${strategy}" = "start-stop" ]]; then
+        for bound_port in "${_ports[@]}"; do
+          if [[ "${next_port}" = "${bound_port}" ]]; then
+            next_port="$((${next_port}+1))"
+          fi
+        done
+      fi
+
+      _ports+=("${next_port}")
+      _create_options=("${_create_options[@]/${port}:/${next_port}:}")
     fi
 
     cmd+=("${_create_options[@]}")
@@ -191,9 +208,7 @@ prepare() {
 }
 
 launch() {
-  local cmd
-
-  echo "Launching created containers"
+  echo "Launching prepared containers"
 
   _define
 
@@ -202,33 +217,85 @@ launch() {
     return 1
   fi
 
-  local name="";
-  for name in "${_containers_running[@]:${instances}}"; do
-    docker stop "${name}"
-  done
+  _stop_start() {
+    local cmd
 
-  local i=0; while (( $i < ${instances} )); do
-    cmd=("docker start")
-    cmd+=("${start_options[@]}")
-    cmd+=("${_containers_created[$i]}")
+    local i=0;
+    while (( $i < ${instances} )); do
+      cmd=("docker start")
+      cmd+=("${start_options[@]}")
+      cmd+=("${_containers_created[$i]}")
 
-    if [[ "${_containers_running[$i]}" ]]; then
-      docker stop "${_containers_running[$i]}"
+      if [[ "${_containers_running[$i]}" ]]; then
+        echo "Stopping container"
+
+        pre_stop
+        docker stop "${_containers_running[$i]}"
+        post_stop
+      fi
+
+      echo "Starting container"
+
+      pre_start
+      eval "${cmd[@]}"
+      sleep ${start_sleep}
+      post_start
+
+      i=$((i+1))
+    done
+  }
+
+  _start_stop() {
+    local cmd
+
+    local i=0;
+    while (( $i < ${instances} )); do
+      cmd=("docker start")
+      cmd+=("${start_options[@]}")
+      cmd+=("${_containers_created[$i]}")
+
+      echo "Starting container"
+
+      pre_start
+      eval "${cmd[@]}"
+      sleep ${start_sleep}
+      post_start
+
+      if [[ "${_containers_running[$i]}" ]]; then
+        echo "Stopping container"
+
+        pre_stop
+        docker stop "${_containers_running[$i]}"
+        post_stop
+      fi
+
+      i=$((i+1))
+    done
+  }
+
+  _stop_excess() {
+    local containers_excess=("${_containers_running[@]:${instances}}")
+
+    if [[ "${containers_excess[@]}" ]]; then
+      echo "Stopping excess containers"
     fi
 
-    pre_start
-    eval "${cmd[@]}"
-    post_start
+    local name="";
+    for name in "${containers_excess[@]}"; do
+      docker stop "${name}"
+    done
+  }
 
-    sleep ${start_sleep}
-
-    i=$((i+1))
-  done
+  if [[ "${strategy}" = "start-stop" ]]; then
+    _start_stop
+    _stop_excess
+  else
+    _stop_excess
+    _stop_start
+  fi
 }
 
 rollback() {
-  local cmd
-
   echo "Rolling back to previous containers"
 
   _define
@@ -238,22 +305,63 @@ rollback() {
     return 1
   fi
 
-  local i=0;
-  for i in "${!_containers_running[@]}"; do
-    docker stop "${_containers_running[$i]}"
+  _stop_start() {
+    local cmd
 
-    if [[ "${_containers_exited[$i]}" ]]; then
-      cmd=("docker start")
-      cmd+=("${start_options[@]}")
-      cmd+=("${_containers_exited[$i]}")
+    local i=0;
+    for i in "${!_containers_running[@]}"; do
+      echo "Stopping container"
 
-      pre_start
-      eval "${cmd[@]}"
-      post_start
+      pre_stop
+      docker stop "${_containers_running[$i]}"
+      post_stop
 
-      sleep ${start_sleep}
-    fi
-  done
+      if [[ "${_containers_exited[$i]}" ]]; then
+        cmd=("docker start")
+        cmd+=("${start_options[@]}")
+        cmd+=("${_containers_exited[$i]}")
+
+        echo "Starting container"
+
+        pre_start
+        eval "${cmd[@]}"
+        sleep ${start_sleep}
+        post_start
+      fi
+    done
+  }
+
+  _start_stop() {
+    local cmd
+
+    local i=0;
+    for i in "${!_containers_running[@]}"; do
+      if [[ "${_containers_exited[$i]}" ]]; then
+        cmd=("docker start")
+        cmd+=("${start_options[@]}")
+        cmd+=("${_containers_exited[$i]}")
+
+        echo "Starting container"
+
+        pre_start
+        eval "${cmd[@]}"
+        sleep ${start_sleep}
+        post_start
+      fi
+
+      echo "Stopping container"
+
+      pre_stop
+      docker stop "${_containers_running[$i]}"
+      post_stop
+    done
+  }
+
+  if [[ "${strategy}" = "start-stop" ]]; then
+    _start_stop
+  else
+    _stop_start
+  fi
 }
 
 _define() {
@@ -281,6 +389,10 @@ _define() {
     --format '{{.Names}}'))
 
   _networks=($(docker network ls --format '{{.Name}}'))
+
+  _ports=($(docker ps -f name="${basename}" --format '{{.Ports}}' | \
+    sed 's/:/\n:/g' | grep ':' | sed -E 's/^:([0-9]+).*/\1/'))
+  _ports=($(printf '%s\n' "${_ports[@]}" | sort -n))
 
   _containers=()
   local name="";
