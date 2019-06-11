@@ -191,6 +191,8 @@ prepare() {
 
       _ports+=("${next_port}")
       _create_options=("${_create_options[@]/${port}:/${next_port}:}")
+
+      cmd+=("-e 'OPS_PORT=${next_port}'")
     fi
 
     cmd+=("${_create_options[@]}")
