@@ -157,7 +157,6 @@ prepare() {
   local publish_re='(^|[^[:alnum:]])-[[:alnum:]]*p(ublish)?.*([[:space:]]|:)([0-9]+):'
 
   local _create_options
-  local port next_port bound_port
   local i=0 n=0;
   for i in "${!_containers_next[@]}"; do
     n=$((i+1))
@@ -171,29 +170,34 @@ prepare() {
       "-e 'OPS_INSTANCE=$n'"
     )
 
-    # network-scoped alias is supported only in user defined networks
+    # Network-scoped alias is supported only in user defined networks
     if [[ ! "${networks[@]}" =~ (^|[[:space:]])(bridge|host|none)([^[:alnum:]]|$) ]]; then
       cmd+=("--net-alias ${basename}-$n")
     fi
 
-    # Match and increment local port number
-    if [[ "${_create_options[@]}" =~ ${publish_re} ]]; then
-      port="${BASH_REMATCH[4]}"
-      next_port="$((${port}+$i))"
+    local j option port next_port bound_port
+    for j in "${!_create_options[@]}"; do
+      option="${_create_options[$j]}"
 
-      if [[ "${strategy}" = "start-stop" ]]; then
-        for bound_port in "${_ports[@]}"; do
-          if [[ "${next_port}" = "${bound_port}" ]]; then
-            next_port="$((${next_port}+1))"
-          fi
-        done
+      # Match and increment published port number
+      if [[ "${option}" =~ ${publish_re} ]]; then
+        port="${BASH_REMATCH[4]}"
+        next_port="$((${port}+$i))"
+
+        if [[ "${strategy}" = "start-stop" ]]; then
+          for bound_port in "${_ports[@]}"; do
+            if [[ "${next_port}" = "${bound_port}" ]]; then
+              next_port="$((${next_port}+1))"
+            fi
+          done
+        fi
+
+        _ports+=("${next_port}")
+        _create_options[$j]="${option/${port}:/${next_port}:}"
+
+        cmd+=("-e 'OPS_PORT=${next_port}'")
       fi
-
-      _ports+=("${next_port}")
-      _create_options=("${_create_options[@]/${port}:/${next_port}:}")
-
-      cmd+=("-e 'OPS_PORT=${next_port}'")
-    fi
+    done
 
     cmd+=("${_create_options[@]}")
     cmd+=("${images[0]}")
