@@ -77,9 +77,10 @@ build() {
 
   cmd+=("${build_args[@]}")
 
-  pre_build
-  eval "${cmd[@]}"
-  post_build
+  pre_build &&
+  eval "${cmd[@]}" &&
+  post_build ||
+  return
 }
 
 transport() {
@@ -203,9 +204,10 @@ prepare() {
     cmd+=("${images[0]}")
     cmd+=("${create_args[@]}")
 
-    pre_create
-    eval "${cmd[@]}"
-    post_create
+    pre_create &&
+    eval "${cmd[@]}" &&
+    post_create ||
+    return
 
     for network in "${networks[@]}"; do
       docker network connect "${network}" "${_containers_next[$i]}"
@@ -235,17 +237,19 @@ launch() {
       if [[ "${_containers_running[$i]}" ]]; then
         echo "Stopping container"
 
-        pre_stop
-        docker stop "${_containers_running[$i]}"
-        post_stop
+        pre_stop &&
+        docker stop "${_containers_running[$i]}" &&
+        post_stop ||
+        return
       fi
 
       echo "Starting container"
 
-      pre_start
-      eval "${cmd[@]}"
-      sleep ${start_sleep}
-      post_start
+      pre_start &&
+      eval "${cmd[@]}" &&
+      sleep ${start_sleep} &&
+      post_start ||
+      return
 
       i=$((i+1))
     done
@@ -262,17 +266,19 @@ launch() {
 
       echo "Starting container"
 
-      pre_start
-      eval "${cmd[@]}"
-      sleep ${start_sleep}
-      post_start
+      pre_start &&
+      eval "${cmd[@]}" &&
+      sleep ${start_sleep} &&
+      post_start ||
+      return
 
       if [[ "${_containers_running[$i]}" ]]; then
         echo "Stopping container"
 
-        pre_stop
-        docker stop "${_containers_running[$i]}"
-        post_stop
+        pre_stop &&
+        docker stop "${_containers_running[$i]}" &&
+        post_stop ||
+        return
       fi
 
       i=$((i+1))
@@ -318,9 +324,10 @@ rollback() {
     for i in "${!_containers_running[@]}"; do
       echo "Stopping container"
 
-      pre_stop
-      docker stop "${_containers_running[$i]}"
-      post_stop
+      pre_stop &&
+      docker stop "${_containers_running[$i]}" &&
+      post_stop ||
+      return
 
       if [[ "${_containers_exited[$i]}" ]]; then
         cmd=("docker start")
@@ -329,10 +336,11 @@ rollback() {
 
         echo "Starting container"
 
-        pre_start
-        eval "${cmd[@]}"
-        sleep ${start_sleep}
-        post_start
+        pre_start &&
+        eval "${cmd[@]}" &&
+        sleep ${start_sleep} &&
+        post_start ||
+        return
       fi
     done
   }
@@ -349,17 +357,19 @@ rollback() {
 
         echo "Starting container"
 
-        pre_start
-        eval "${cmd[@]}"
-        sleep ${start_sleep}
-        post_start
+        pre_start &&
+        eval "${cmd[@]}" &&
+        sleep ${start_sleep} &&
+        post_start ||
+        return
       fi
 
       echo "Stopping container"
 
-      pre_stop
-      docker stop "${_containers_running[$i]}"
-      post_stop
+      pre_stop &&
+      docker stop "${_containers_running[$i]}" &&
+      post_stop ||
+      return
     done
   }
 
