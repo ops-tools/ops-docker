@@ -216,11 +216,23 @@ prepare() {
 }
 
 launch() {
-  echo "Launching prepared containers"
+  local containers
+
+  echo "Launching containers"
 
   _define
 
-  if [[ -z "${_containers_created[@]}" ]]; then
+  containers=("${_containers_created[@]}")
+
+  if [[ -z "${containers[@]}" ]]; then
+    containers=("${_containers_running[@]}")
+  fi
+
+  if [[ -z "${containers[@]}" ]]; then
+    containers=("${_containers_exited[@]}")
+  fi
+
+  if [[ -z "${containers[@]}" ]]; then
     echo "Nothing to launch, please \`prepare' something first"
     return 1
   fi
@@ -232,7 +244,7 @@ launch() {
     while (( $i < ${instances} )); do
       cmd=("docker start")
       cmd+=("${start_options[@]}")
-      cmd+=("${_containers_created[$i]}")
+      cmd+=("${containers[$i]}")
 
       if [[ "${_containers_running[$i]}" ]]; then
         echo "Stopping container"
@@ -262,7 +274,7 @@ launch() {
     while (( $i < ${instances} )); do
       cmd=("docker start")
       cmd+=("${start_options[@]}")
-      cmd+=("${_containers_created[$i]}")
+      cmd+=("${containers[$i]}")
 
       echo "Starting container"
 
@@ -525,7 +537,7 @@ Commands:
   build      Build local image
   transport  Transport image to remotes
   prepare    Prepare containers for launch
-  launch     Start or restart ready containers
+  launch     Launch ready containers
   deploy     Shortcut for: prepare launch
   rollout    Shortcut for: build transport -l; prepare launch
   rollback   Stop current and start previous containers
@@ -583,7 +595,10 @@ _parse_args() {
 
     if [[ "${arg}" = "rollout" ]]; then
       _force_local=true
-      _commands+=("build" "transport" "_exec_remote" "prepare" "launch")
+
+      _commands+=("build")
+      [[ "${remotes[@]}" ]] && _commands+=("transport" "_exec_remote")
+      _commands+=("prepare" "launch")
     fi
   done
 }
