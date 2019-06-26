@@ -595,10 +595,7 @@ _parse_args() {
 
     if [[ "${arg}" = "rollout" ]]; then
       _force_local=true
-
-      _commands+=("build")
-      [[ "${remotes[@]}" ]] && _commands+=("transport" "_exec_remote")
-      _commands+=("prepare" "launch")
+      _commands+=("build" "transport" "_exec_remote" "prepare" "launch")
     fi
   done
 }
