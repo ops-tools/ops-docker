@@ -7,7 +7,7 @@
 # set -x
 set -e
 
-# Defaults
+# Public
 
 ## Base settings
 basename="project"
@@ -17,7 +17,7 @@ instances=1
 strategy="stop-start"
 remotes=()
 
-## Docker control settings
+## Docker settings
 network_create_options=()
 network_connect_options=()
 build_options=()
@@ -26,6 +26,9 @@ create_options=()
 create_args=()
 start_options=()
 start_sleep=0
+
+## Globals
+OPS_PORT=()
 
 ## Hooks
 pre_build() { :; }
@@ -37,7 +40,7 @@ post_stop() { :; }
 pre_start() { :; }
 post_start() { :; }
 
-# Globals
+# Private globals
 _script="$0"
 _workdir=".ops-docker"
 _scriptsdir="${_workdir}/scripts"
@@ -196,6 +199,7 @@ prepare() {
         _ports+=("${next_port}")
         _create_options[$j]="${option/${port}:/${next_port}:}"
 
+        OPS_PORT+=("${next_port}")
         cmd+=("-e 'OPS_PORT=${next_port}'")
       fi
     done
