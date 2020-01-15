@@ -80,9 +80,9 @@ build() {
 
   cmd+=("${build_args[@]}")
 
-  pre_build &&
+  _run_hook "pre_build" &&
   eval "${cmd[@]}" &&
-  post_build ||
+  _run_hook "post_build" ||
   return
 }
 
@@ -199,7 +199,6 @@ prepare() {
         _ports+=("${next_port}")
         _create_options[$j]="${option/${port}:/${next_port}:}"
 
-        OPS_PORT+=("${next_port}")
         cmd+=("-e 'OPS_PORT=${next_port}'")
       fi
     done
@@ -208,9 +207,9 @@ prepare() {
     cmd+=("${images[0]}")
     cmd+=("${create_args[@]}")
 
-    pre_create &&
+    _run_hook "pre_create" &&
     eval "${cmd[@]}" &&
-    post_create ||
+    _run_hook "post_create" ||
     return
 
     for network in "${networks[@]}"; do
@@ -253,18 +252,18 @@ launch() {
       if [[ "${_containers_running[$i]}" ]]; then
         echo "Stopping container"
 
-        pre_stop &&
+        _run_hook "pre_stop" &&
         docker stop "${_containers_running[$i]}" &&
-        post_stop ||
+        _run_hook "post_stop" ||
         return
       fi
 
       echo "Starting container"
 
-      pre_start &&
+      _run_hook "pre_start" &&
       eval "${cmd[@]}" &&
       sleep ${start_sleep} &&
-      post_start ||
+      _run_hook "post_start" ||
       return
 
       i=$((i+1))
@@ -282,18 +281,18 @@ launch() {
 
       echo "Starting container"
 
-      pre_start &&
+      _run_hook "pre_start" &&
       eval "${cmd[@]}" &&
       sleep ${start_sleep} &&
-      post_start ||
+      _run_hook "post_start" ||
       return
 
       if [[ "${_containers_running[$i]}" ]]; then
         echo "Stopping container"
 
-        pre_stop &&
+        _run_hook "pre_stop" &&
         docker stop "${_containers_running[$i]}" &&
-        post_stop ||
+        _run_hook "post_stop" ||
         return
       fi
 
@@ -340,9 +339,9 @@ rollback() {
     for i in "${!_containers_running[@]}"; do
       echo "Stopping container"
 
-      pre_stop &&
+      _run_hook "pre_stop" &&
       docker stop "${_containers_running[$i]}" &&
-      post_stop ||
+      _run_hook "post_stop" ||
       return
 
       if [[ "${_containers_exited[$i]}" ]]; then
@@ -352,10 +351,10 @@ rollback() {
 
         echo "Starting container"
 
-        pre_start &&
+        _run_hook "pre_start" &&
         eval "${cmd[@]}" &&
         sleep ${start_sleep} &&
-        post_start ||
+        _run_hook "post_start" ||
         return
       fi
     done
@@ -373,18 +372,18 @@ rollback() {
 
         echo "Starting container"
 
-        pre_start &&
+        _run_hook "pre_start" &&
         eval "${cmd[@]}" &&
         sleep ${start_sleep} &&
-        post_start ||
+        _run_hook "post_start" ||
         return
       fi
 
       echo "Stopping container"
 
-      pre_stop &&
+      _run_hook "pre_stop" &&
       docker stop "${_containers_running[$i]}" &&
-      post_stop ||
+      _run_hook "post_stop" ||
       return
     done
   }
@@ -394,6 +393,25 @@ rollback() {
   else
     _stop_start
   fi
+}
+
+_run_hook() {
+  _reset_vars
+  $1
+}
+
+_reset_vars() {
+  OPS_PORT=($(_parse_ports))
+}
+
+_parse_ports() {
+  local ports=($(docker ps -f name="${basename}" --format="{{.Names}}" | \
+    xargs -r -n 1 docker inspect \
+      --format='{{.State.StartedAt}}{{range .NetworkSettings.Ports}} {{(index . 0).HostPort}}{{end}}' 2> /dev/null | \
+    sort -r -k 1 | \
+    cut -d ' ' -f 2- | xargs -L 1 bash -c "printf '%s\n' \$@ | tac" -))
+
+  echo "${ports[@]}"
 }
 
 _define() {
@@ -422,8 +440,7 @@ _define() {
 
   _networks=($(docker network ls --format '{{.Name}}'))
 
-  _ports=($(docker ps -f name="${basename}" --format '{{.Ports}}' | \
-    sed 's/:/\n:/g' | grep ':' | sed -E 's/^:([0-9]+).*/\1/'))
+  _ports=($(_parse_ports))
   _ports=($(printf '%s\n' "${_ports[@]}" | sort -n))
 
   _containers=()
