@@ -17,7 +17,7 @@ pre_build() {
   __hook="pre"
 }
 
-build &>/dev/null
+assemble &>/dev/null
 
 if [[ "${__hook}" == "pre" ]]; then
   __ok
@@ -38,7 +38,7 @@ post_build() {
   __hook="post"
 }
 
-build &>/dev/null
+assemble &>/dev/null
 
 if [[ "${__hook}" == "post" ]]; then
   __ok
@@ -59,7 +59,7 @@ images=(
   "ops-docker-test-rest"
 )
 
-build &>/dev/null
+assemble &>/dev/null
 
 __images=($(docker images -f 'reference=ops-docker-test-*' --format '{{.Repository}}'))
 

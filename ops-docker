@@ -60,10 +60,10 @@ _containers_running=()
 _containers_exited=()
 _containers_next=()
 
-build() {
+assemble() {
   local cmd
 
-  echo "Building \`${images[0]}' image"
+  echo "Assemble \`${images[0]}' image"
 
   cmd=("docker build")
 
@@ -555,12 +555,12 @@ Configurable docker deployment tool in pure bash
 Usage: $0 [options] <commands>
 
 Commands:
-  build      Build local image
+  assemble   Assemble image locally
   transport  Transport image to remotes
   prepare    Prepare containers for launch
   launch     Launch ready containers
   deploy     Shortcut for: prepare launch
-  rollout    Shortcut for: build transport -l; prepare launch
+  rollout    Shortcut for: assemble transport -l; prepare launch
   rollback   Stop current and start previous containers
 
 Options:
@@ -606,7 +606,7 @@ _parse_args() {
 
   local arg="";
   for arg in "${args[@]}"; do
-    if [[ "build transport prepare launch rollback" = *"${arg}"* ]]; then
+    if [[ "assemble transport prepare launch rollback" = *"${arg}"* ]]; then
       _commands+=("${arg}")
     fi
 
@@ -616,7 +616,7 @@ _parse_args() {
 
     if [[ "${arg}" = "rollout" ]]; then
       _force_local=true
-      _commands+=("build" "transport" "_exec_remote" "prepare" "launch")
+      _commands+=("assemble" "transport" "_exec_remote" "prepare" "launch")
     fi
   done
 }

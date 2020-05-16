@@ -41,12 +41,12 @@ Configurable docker deployment tool in pure bash
 Usage: ops-docker [options] <commands>
 
 Commands:
-  build      Build local image
+  assemble   Assemble image locally
   transport  Transport image to remotes
   prepare    Prepare containers for launch
   launch     Start or restart ready containers
   deploy     Shortcut for: prepare launch
-  rollout    Shortcut for: build transport -l; prepare launch
+  rollout    Shortcut for: assemble transport -l; prepare launch
   rollback   Stop current and start previous containers
 
 Options:
@@ -61,19 +61,19 @@ ops-docker commands are basically higher-level abstractions for plain docker com
 
 For example.
 
-`ops-docker -c conf/docker.cfg -l build deploy` – will build the image on the local machine and deploy it on the same machine.
+`ops-docker -c conf/docker.cfg -l assemble deploy` – will assemble the image on the local machine and deploy it on the same machine.
 
-`ops-docker -c conf/docker.cfg rollout` – will build the image and transfer it from the local machine to remotes, then run containers from this image.
+`ops-docker -c conf/docker.cfg rollout` – will assemble the image and transfer it from the local machine to remotes, then run containers from this image.
 
-`ops-docker -c conf/dockre.cfg -l build transport` – will build and transport the new image to remotes, but not start it now.
+`ops-docker -c conf/docker.cfg -l assemble transport` – will assemble and transport the new image to remotes, but not start it now.
 
-#### build
+#### assemble
 
-Builds docker image.
+Assembles docker image.
 
 #### transport
 
-Transports built image to remotes using rsync.
+Transports assembled image to remotes using rsync.
 
 #### prepare
 
@@ -89,7 +89,7 @@ Shortcut for `prepare` and `launch` commands to simplify deploy operation.
 
 #### rollout
 
-Shortcut for `build` and `transport` ran at local, then `prepare` and `launch` ran at remotes. This is the command for rolling out from scratch.
+Shortcut for `assemble` and `transport` ran at local, then `prepare` and `launch` ran at remotes. This is the command for rolling out from scratch.
 
 #### rollback
 
@@ -105,7 +105,7 @@ Path to configuration file.
 
 #### -l, --local
 
-Switch for forcing local running of commands (default is remote). For simple deploy schemes like *build machine* -> *production machine* you wants `-l` for `build` and `transport` commands, but not for `prepare` and `launch`.
+Switch for forcing local running of commands (default is remote). For simple deploy schemes like *build machine* -> *production machine* you wants `-l` for `assemble` and `transport` commands, but not for `prepare` and `launch`.
 
 #### -h, --help
 

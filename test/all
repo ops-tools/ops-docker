@@ -6,7 +6,7 @@ __exit_code=0
 source "${__lib}/__util.sh"
 
 source "${__lib}/_vars.sh"
-source "${__lib}/build.sh"
+source "${__lib}/assemble.sh"
 source "${__lib}/transport.sh"
 source "${__lib}/prepare.sh"
 source "${__lib}/launch.sh"
