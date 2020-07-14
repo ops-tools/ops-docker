@@ -63,7 +63,7 @@ _containers_next=()
 assemble() {
   local cmd
 
-  echo "Assemble \`${images[0]}' image"
+  echo "Assembling \`${images[0]}' image"
 
   cmd=("docker build")
 
