@@ -1,6 +1,6 @@
 # ops-docker
 
-> Configurable docker deployment tool in pure bash
+> Configurable docker deployment tool in standard bash.
 
 ops-docker – is a single bash script that can perform standard deploy tasks in a simple and performant way using tools you already have in your systems for decades or so.
 
@@ -35,16 +35,15 @@ You likely have all of these programs already installed when using modern Linux 
 Running `ops-docker` without parameters or with `--help` switch will show you a short usage message.
 
 ```
-$ ops-docker
-Configurable docker deployment tool in pure bash
+Configurable docker deployment tool in standard bash.
 
-Usage: ops-docker [options] <commands>
+Usage: ./ops-docker [options] <commands>
 
 Commands:
-  assemble   Assemble image locally
+  assemble   Assemble local image
   transport  Transport image to remotes
   prepare    Prepare containers for launch
-  launch     Start or restart ready containers
+  launch     Launch prepared containers
   deploy     Shortcut for: prepare launch
   rollout    Shortcut for: assemble transport -l; prepare launch
   rollback   Stop current and start previous containers

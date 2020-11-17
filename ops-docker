@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##
-# Configurable docker deployment tool in pure bash
+# Configurable docker deployment tool in standard bash.
 ##
 
 # set -x
@@ -142,7 +142,7 @@ transport() {
 prepare() {
   local cmd
 
-  echo "Preparing containers from \`${images[0]}' image for launch"
+  echo "Preparing for launch containers from \`${images[0]}' image"
 
   _define
 
@@ -221,7 +221,7 @@ prepare() {
 launch() {
   local containers
 
-  echo "Launching containers"
+  echo "Launching prepared containers"
 
   _define
 
@@ -550,15 +550,15 @@ _exec_remote() {
 
 _print_help() {
   echo "\
-Configurable docker deployment tool in pure bash
+Configurable docker deployment tool in standard bash.
 
 Usage: $0 [options] <commands>
 
 Commands:
-  assemble   Assemble image locally
+  assemble   Assemble local image
   transport  Transport image to remotes
   prepare    Prepare containers for launch
-  launch     Launch ready containers
+  launch     Launch prepared containers
   deploy     Shortcut for: prepare launch
   rollout    Shortcut for: assemble transport -l; prepare launch
   rollback   Stop current and start previous containers
