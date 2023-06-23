@@ -30,6 +30,13 @@ start_sleep=0
 ## Globals
 OPS_PORT=()
 
+## Events
+on_assemble() { :; }
+on_transport() { :; }
+on_prepare() { :; }
+on_launch() { :; }
+on_rollback() { :; }
+
 ## Hooks
 pre_build() { :; }
 post_build() { :; }
@@ -61,6 +68,8 @@ _containers_exited=()
 _containers_next=()
 
 assemble() {
+  on_assemble || true
+
   local cmd
 
   echo "Assembling \`${images[0]}' image"
@@ -87,6 +96,8 @@ assemble() {
 }
 
 transport() {
+  on_transport || true
+
   local image_id args user_host port path pid pids
 
   echo "Transporting \`${images[0]}' image to remotes"
@@ -140,6 +151,8 @@ transport() {
 }
 
 prepare() {
+  on_prepare || true
+
   local cmd
 
   echo "Preparing for launch containers from \`${images[0]}' image"
@@ -219,6 +232,8 @@ prepare() {
 }
 
 launch() {
+  on_launch || true
+
   local containers
 
   echo "Launching prepared containers"
@@ -323,6 +338,8 @@ launch() {
 }
 
 rollback() {
+  on_rollback || true
+
   echo "Rolling back to previous containers"
 
   _define
